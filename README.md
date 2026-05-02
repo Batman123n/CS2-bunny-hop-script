@@ -1,4 +1,4 @@
-# This is a simple CS2 bhoping tools made with C++
+# CS2 Bhop
 ### Requirements: Visual Studio 2022 community, CS2
 ### How to build:
 First download VS 2022 community if you haven't already and when installing select Desktop development with C++. \
