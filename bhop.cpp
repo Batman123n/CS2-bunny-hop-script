@@ -1,3 +1,4 @@
+#include <chrono>
 #include <windows.h>
 #include <iostream>
 #include <thread>
@@ -64,16 +65,16 @@ int main() {
                     // Quick "tap" of the spacebar
                     PostMessage(hwnd, WM_KEYDOWN, VK_SPACE, 0);
 
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                    std::this_thread::sleep_for(std::chrono::nanoseconds(10));
 
                     PostMessage(hwnd, WM_KEYUP, VK_SPACE, 0);
                 }
             }
-            // While holding space, poll faster (1ms) for frame-perfect jumps
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            // While holding space, poll faster (1ns) for frame-perfect jumps
+            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
 
         } else {
-            // While NOT holding space, poll slower (10ms) to save laptop battery
+            // While NOT holding space, poll slower (10ms) to save energy
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
