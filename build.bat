@@ -11,6 +11,24 @@ echo.
 REM --- Configuration ---
 set PROJECT_DIR=%CD%
 
+REM --- Run dumper before build ---
+echo [0/4] Running offset dumper...
+
+if exist "cs2-dumper.exe" (
+    echo Found cs2-dumper.exe, updating offsets...
+    cs2-dumper.exe
+
+    if %ERRORLEVEL% neq 0 (
+        echo WARNING! Dumper failed, compiling with possibly outdated offsets.
+    ) else (
+        echo Offsets updated successfully.
+    )
+) else (
+    echo WARNING! compiling with old offsets
+)
+
+echo.
+
 REM --- Clean previous build ---
 if exist "bhop.exe" del "bhop.exe"
 del *.obj *.pdb *.ilk *.exp 2>nul
@@ -33,7 +51,6 @@ if %ERRORLEVEL% neq 0 (
 )
 
 echo [3/4] Linking with LTCG and ICF...
-:: Links the required libraries that were in your original g++ script: user32.lib and winmm.lib
 link /OUT:bhop.exe bhop.obj user32.lib winmm.lib /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG
 
 if %ERRORLEVEL% neq 0 (
