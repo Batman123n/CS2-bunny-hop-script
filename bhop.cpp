@@ -42,32 +42,30 @@ int main() {
     SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 
     HWND hwnd = FindWindowA(NULL, "Counter-Strike 2");
-    if (!hwnd) return 1;
+    if (!hwnd) {
+        std::cerr << "[-] Could not find Counter-Strike 2 window." << std::endl;
+        return 1;
+    }
 
     DWORD pid;
     GetWindowThreadProcessId(hwnd, &pid);
     HANDLE hProcess = OpenProcess(PROCESS_VM_READ, FALSE, pid);
 
     uintptr_t clientModule = GetModuleBaseAddress(pid, "client.dll");
-    if (!clientModule) return 1;
+    if (!clientModule) {
+        std::cerr << "[-] Could not find client.dll." << std::endl;
+        return 1;
+    }
 
-    std::cout << "[+] BHOP Active | Hold SPACE | P to Toggle Pause | END to exit" << std::endl;
+    std::cout << "[+] BHOP Active | Hold MOUSE4 | END to exit" << std::endl;
 
     uintptr_t localPlayer = 0;
     auto lastJump = std::chrono::steady_clock::now();
-    bool paused = false;
 
     while (!(GetAsyncKeyState(VK_END) & 0x8000)) {
 
-        // Simple toggle for 'P'
-        if (GetAsyncKeyState('P') & 0x8000) {
-            paused = !paused;
-            std::cout << (paused ? "[!] Paused (Chat Mode)" : "[+] Resumed (BHOP Mode)") << std::endl;
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
-        }
-
-        // Your original logic, only runs if not paused
-        if (!paused && (GetAsyncKeyState(VK_SPACE) & 0x8000)) {
+        // Logic check: Detects if Mouse4 (VK_XBUTTON1) is held
+        if (GetAsyncKeyState(VK_XBUTTON1) & 0x8000) {
             localPlayer = Read<uintptr_t>(hProcess, clientModule + offsets::dwLocalPlayerPawn);
 
             if (localPlayer) {
@@ -84,7 +82,7 @@ int main() {
             }
             std::this_thread::sleep_for(std::chrono::microseconds(500));
         } else {
-            // Idle sleep to keep CPU usage low when paused or space isn't held
+            // Idle sleep to keep CPU usage low
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
     }
